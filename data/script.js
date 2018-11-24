@@ -1,25 +1,45 @@
 var iter = 0
-var imglist = []
+var medialist = []
 
-var photolimit
+var medialimit
 
-setPhotoHeight = function(){
+setMediaHeight = function(){
 	var height = window.innerHeight;
-	var vids = document.getElementsByClassName('vidsbeeyotch');
-	for (var i = 0; i < vids.length; i++) {
-		vids[i].style.height = height + 'px';
+	var medias = document.getElementsByClassName('image video');
+	for (var i = 0; i < medias.length; i++) {
+		medias[i].style.height = height + 'px';
 	}
 }
 
-createnewimage = function(num){
-	var paragraph = document.getElementById("gallery")
-	while(num > 0 && iter < imglist.length){
-		var newimage = document.createElement("img");
-		newimage.setAttribute('src',imglist[iter]);
-		newimage.setAttribute('id', iter);
-		newimage.setAttribute('class','vidsbeeyotch');
-		newimage.setAttribute('height',window.innerHeight)
-		paragraph.appendChild(newimage);
+addimage = function(image,id){
+	var paragraph = document.getElementById("gallery");
+	var newimage = document.createElement("img");
+	newimage.setAttribute('src',image);
+	newimage.setAttribute('id', id);
+	newimage.setAttribute('class','image');
+	newimage.setAttribute('height',window.innerHeight);
+	paragraph.appendChild(newimage);
+}
+
+addvideo = function(video,id){
+	var paragraph = document.getElementById("gallery");
+	var newvid = document.createElement("video");
+	newvid.setAttribute('src',video);
+	newvid.setAttribute('id',id);
+	newvid.setAttribute('class','video');
+	newvid.setAttribute('height',window.innerHeight);
+	newvid.setAttribute('controls','controls');
+	paragraph.appendChild(newvid);
+}
+
+genMedia = function(num){
+	while(num > 0 && iter < medialist.length){
+		if (/.*\.(jpeg|jpg|gif|png)$/.test(medialist[iter])){
+			addimage(medialist[iter]);
+		}
+		else if (/.*\.(mp4|mov|webm)$/.test(medialist[iter])){
+			addvideo(medialist[iter],iter);
+		}
 		iter ++;
 		num --;
 	}
@@ -31,19 +51,16 @@ loadmoaronbottom = function(){
 	totalheight = document.body.scrollHeight;
 	progress = window.scrollY + window.innerHeight;
 	if(totalheight <= progress + buffer){
-		createnewimage(10)
+		genMedia(10);
 	}
 }
 
-deleteimage = function(){
-	var image = document.getElementById(iter-photolimit);
-}
-window.onresize = setPhotoHeight;
+window.onresize = setMediaHeight;
 window.onscroll = loadmoaronbottom;
 var alreadyloadedonce = 0
 window.onload = function(){
 	if (alreadyloadedonce == 0){
-		createnewimage(10);
+		genMedia(10);
 		alreadyloadedonce = 1;
 	}
 

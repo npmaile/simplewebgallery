@@ -2,17 +2,31 @@
 	<head>
 	<script src="script.js"></script>
 <script>
-var imglist=[
+var medialist=[
 <?php
+
+$mediaPatterns;
+
+if (!empty($_GET['media'])){
+	$mediaPatterns = $_GET['media'];
+}
+
+
 $rootdir = $_SERVER['DOCUMENT_ROOT'];
 $workingdir = $rootdir;
-if (!empty($_GET)){
+if (!empty($_GET['path'])){
 	$requestpath = urldecode($_GET['path']);
 	$workingdir = ("$rootdir/$requestpath");
 }
+
+
+
+
+
 function fileextension($name){
 return substr($name, strrpos($name, '.')+1, strlen($name)-strrpos('.', $name));
 }
+
 
 function getfiles($rootpath,$patterns){
 	$ret = array();
@@ -31,13 +45,13 @@ function getfiles($rootpath,$patterns){
 	}
 	return $ret;
 }
-$photoPatterns = array("jpg","png", "jpeg", "gif");
-	$filesToDisplay = getfiles($workingdir, $photoPatterns);
-	shuffle($filesToDisplay);	
-	foreach ($filesToDisplay as $image){
-	$imgLink = str_replace("$rootdir/",'',$image);	
-	echo("\"$imgLink\",\n");
-	}
+
+$filesToDisplay = getfiles($workingdir, $mediaPatterns);
+shuffle($filesToDisplay);	
+foreach ($filesToDisplay as $file){
+	$mediaLink = str_replace("$rootdir/",'',$file);	
+	echo("\"$mediaLink\",\n");
+}
 
 
 
