@@ -32,15 +32,19 @@
 				array_push($directories,$file);
 				}
 			}
+			echo("<table><tr><th>path</th><th>photogallery</th><th>videogallery</th></tr>");
 			foreach($directories as $directory){
 			$cleandirref = str_replace("$webroot/",'',"$workingpath/$directory");
-			$urlencodeddir = urlencode($cleandirref);		
-			echo("<br>");
+			$urlencodeddir = urlencode($cleandirref);	
+			echo("<tr><th>");
 			IndexLink($urlencodeddir, $cleandirref);
+			echo("</th><th>");
 			PhotoLink($urlencodeddir);
+			echo("</th><th>");
 			VidLink($urlencodeddir);
-			echo("</br>\n");
+			echo("</th></tr>\n");
 			}
+			echo("</table>");
 		?>
 	</body>
 </html>
