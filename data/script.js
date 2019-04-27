@@ -17,7 +17,6 @@ addimage = function(image,id){
 	newimage.setAttribute('src',image);
 	newimage.setAttribute('id', id);
 	newimage.setAttribute('class','image');
-	newimage.setAttribute('height',window.innerHeight);
 	paragraph.appendChild(newimage);
 }
 
@@ -27,7 +26,6 @@ addvideo = function(video,id){
 	newvid.setAttribute('src',video);
 	newvid.setAttribute('id',id);
 	newvid.setAttribute('class','video');
-	newvid.setAttribute('height',window.innerHeight);
 	newvid.setAttribute('controls','controls');
 	paragraph.appendChild(newvid);
 }
