@@ -14,7 +14,7 @@ setMediaHeight = function(){
 addimage = function(image,id){
 	var paragraph = document.getElementById("gallery");
 	var newimage = document.createElement("img");
-	newimage.setAttribute('src',image);
+	newimage.setAttribute('src',encodeURIComponent(image));
 	newimage.setAttribute('id', id);
 	newimage.setAttribute('class','image');
 	paragraph.appendChild(newimage);
@@ -23,7 +23,7 @@ addimage = function(image,id){
 addvideo = function(video,id){
 	var paragraph = document.getElementById("gallery");
 	var newvid = document.createElement("video");
-	newvid.setAttribute('src',video);
+	newvid.setAttribute('src',encodeURIComponent(video));
 	newvid.setAttribute('id',id);
 	newvid.setAttribute('class','video');
 	newvid.setAttribute('controls','controls');
@@ -44,7 +44,7 @@ genMedia = function(num){
 }
 
 loadmoaronbottom = function(){
-	var buffer = 10
+	var buffer = 20
 	var progress, totalheight;
 	totalheight = document.body.scrollHeight;
 	progress = window.scrollY + window.innerHeight;
@@ -58,7 +58,7 @@ window.onscroll = loadmoaronbottom;
 var alreadyloadedonce = 0
 window.onload = function(){
 	if (alreadyloadedonce == 0){
-		genMedia(10);
+		genMedia(20);
 		alreadyloadedonce = 1;
 	}
 
