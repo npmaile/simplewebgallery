@@ -44,7 +44,9 @@ function getfiles($rootpath,$patterns){
 }
 
 $filesToDisplay = getfiles($workingdir, $mediaPatterns);
-shuffle($filesToDisplay);	
+if(!empty($_GET['order'])){
+	shuffle($filesToDisplay);	
+}
 foreach ($filesToDisplay as $file){
 	$mediaLink = str_replace("$rootdir/",'',$file);	
 	echo("\"$mediaLink\",\n");
@@ -69,7 +71,7 @@ foreach ($filesToDisplay as $file){
 			}
 
 			function VidLink($link){
-				echo("<a href=/index.php?path=$link&media[]=mp4&media[]=wmv&media[]=webm> videos</a>");
+				echo("<a href=/index.php?order=random&path=$link&media[]=mp4&media[]=wmv&media[]=webm> videos</a>");
 			}
 
 
