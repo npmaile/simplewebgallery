@@ -5,7 +5,7 @@ var medialimit
 
 setMediaHeight = function(){
 	var height = window.innerHeight;
-	var medias = document.getElementsByClassName('image video');
+	var medias = document.getElementsByClassName('image video-js');
 	for (var i = 0; i < medias.length; i++) {
 		medias[i].style.height = height + 'px';
 	}
@@ -23,10 +23,13 @@ addimage = function(image,id){
 addvideo = function(video,id){
 	var paragraph = document.getElementById("gallery");
 	var newvid = document.createElement("video");
-	newvid.setAttribute('src',encodeURIComponent(video));
+	var source = document.createElement("source");
+	source.setAttribute('src',encodeURIComponent(video));
+	newvid.appendChild(source);
 	newvid.setAttribute('id',id);
-	newvid.setAttribute('class','video');
-	newvid.setAttribute('controls','controls');
+	newvid.setAttribute('class','video-js');
+	newvid.setAttribute('data-setup','{"controls":"true"}');
+	newvid.setAttribute('fluid','true');
 	paragraph.appendChild(newvid);
 }
 

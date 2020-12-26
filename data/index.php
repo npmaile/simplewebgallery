@@ -1,7 +1,9 @@
 <html>
 	<head>
-<link rel="stylesheet" href="style.css">
-<script src="script.js"/></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<link rel="stylesheet" type="text/css" href="video-js.min.css">
+<script src="video.min.js"></script>
+<script src="script.js"></script>
 <script>
 var medialist=[
 <?php
@@ -43,13 +45,17 @@ function getfiles($rootpath,$patterns){
 	return $ret;
 }
 
-$filesToDisplay = getfiles($workingdir, $mediaPatterns);
+if(!is_null($mediaPatterns)){
+	$filesToDisplay = getfiles($workingdir, $mediaPatterns);
+}
 if(!empty($_GET['order'])){
 	shuffle($filesToDisplay);	
 }
-foreach ($filesToDisplay as $file){
-	$mediaLink = str_replace("$rootdir/",'',$file);	
-	echo("\"$mediaLink\",\n");
+if(!empty($filesToDisplay)){
+	foreach ($filesToDisplay as $file){
+		$mediaLink = str_replace("$rootdir/",'',$file);	
+		echo("\"$mediaLink\",\n");
+	}
 }
 
 
