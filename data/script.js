@@ -31,6 +31,10 @@ addvideo = function(video,id){
 	newvid.setAttribute('data-setup','{"controls":"true"}');
 	newvid.setAttribute('fluid','true');
 	paragraph.appendChild(newvid);
+	var title = document.createElement("div")
+	title.innerHTML = video
+	title.setAttribute('class','title')
+	paragraph.appendChild(title)
 }
 
 genMedia = function(num){

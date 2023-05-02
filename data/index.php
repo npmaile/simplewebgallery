@@ -38,23 +38,28 @@ function getfiles($rootpath,$patterns){
 		elseif(is_dir("$pathToCheck")){
 			$ret = array_merge($ret,getfiles("$pathToCheck",$patterns));
 		}
-		elseif(in_array(fileextension("$pathToCheck"),$patterns)){
+		elseif(in_array(pathinfo("$pathToCheck")['extension'],$patterns)){
 			array_push($ret,"$pathToCheck");
 		}
 	}
 	return $ret;
 }
 
-if(!is_null($mediaPatterns)){
+if(!empty($mediaPatterns)){
 	$filesToDisplay = getfiles($workingdir, $mediaPatterns);
 }
 if(!empty($_GET['order'])){
 	shuffle($filesToDisplay);	
 }
 if(!empty($filesToDisplay)){
+	$mediaLink = str_replace("\"","\\\"",str_replace("$rootdir/",'',array_pop($filesToDisplay)));
+	echo("\"$mediaLink\"");
+
+}
+if(!empty($filesToDisplay)){
 	foreach ($filesToDisplay as $file){
-		$mediaLink = str_replace("$rootdir/",'',$file);	
-		echo("\"$mediaLink\",\n");
+		$mediaLink = str_replace("\"","\\\"",str_replace("$rootdir/",'',$file));	
+		echo(",\n\"$mediaLink\"");
 	}
 }
 
@@ -77,7 +82,7 @@ if(!empty($filesToDisplay)){
 			}
 
 			function VidLink($link){
-				echo("<a href=/index.php?order=random&path=$link&media[]=mp4&media[]=wmv&media[]=webm> videos</a>");
+				echo("<a href=/index.php?order=random&path=$link&media[]=mp4&media[]=wmv&media[]=webm&media[]=m4v> videos</a>");
 			}
 
 
