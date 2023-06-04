@@ -29,7 +29,10 @@ addvideo = function(video,id){
 	newvid.setAttribute('id',id);
 	newvid.setAttribute('class','video-js');
 	newvid.setAttribute('data-setup','{"controls":"true"}');
-	newvid.setAttribute('fluid','true');
+	newvid.setAttribute('loop',"true");
+	newvid.setAttribute('responsive',"true");
+	newvid.setAttribute('fill',"true");
+
 	paragraph.appendChild(newvid);
 	var title = document.createElement("div")
 	title.innerHTML = video
@@ -42,7 +45,7 @@ genMedia = function(num){
 		if (/.*\.(jpeg|jpg|gif|png)$/.test(medialist[iter])){
 			addimage(medialist[iter]);
 		}
-		else if (/.*\.(mp4|mov|webm)$/.test(medialist[iter])){
+		else if (/.*\.(m4v|mp4|mov|webm)$/.test(medialist[iter])){
 			addvideo(medialist[iter],iter);
 		}
 		iter ++;

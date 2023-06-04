@@ -1,5 +1,5 @@
-body{
-	background-color: black;
+:root {
+	color-scheme: light dark;
 }
 
 video{
