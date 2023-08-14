@@ -21,23 +21,27 @@ addimage = function(image,id){
 }
 
 addvideo = function(video,id){
+	var idString = "video" + String(id)
 	var paragraph = document.getElementById("gallery");
 	var newvid = document.createElement("video");
 	var source = document.createElement("source");
 	source.setAttribute('src',encodeURIComponent(video));
 	newvid.appendChild(source);
-	newvid.setAttribute('id',id);
+	newvid.setAttribute('id',idString);
 	newvid.setAttribute('class','video-js');
 	newvid.setAttribute('data-setup','{"controls":"true"}');
 	newvid.setAttribute('loop',"true");
 	newvid.setAttribute('responsive',"true");
 	newvid.setAttribute('fill',"true");
-
 	paragraph.appendChild(newvid);
-	var title = document.createElement("div")
-	title.innerHTML = video
-	title.setAttribute('class','title')
-	paragraph.appendChild(title)
+
+	console.log(idString);
+	videojs(idString);
+
+	var title = document.createElement("div");
+	title.innerHTML = video;
+	title.setAttribute('class','title');
+	paragraph.appendChild(title);
 }
 
 genMedia = function(num){
@@ -47,6 +51,7 @@ genMedia = function(num){
 		}
 		else if (/.*\.(m4v|mp4|mov|webm)$/.test(medialist[iter])){
 			addvideo(medialist[iter],iter);
+			console.log(iter)
 		}
 		iter ++;
 		num --;
@@ -59,7 +64,7 @@ loadmoaronbottom = function(){
 	totalheight = document.body.scrollHeight;
 	progress = window.scrollY + window.innerHeight;
 	if(totalheight <= progress + buffer){
-		genMedia(10);
+		genMedia(buffer);
 	}
 }
 
