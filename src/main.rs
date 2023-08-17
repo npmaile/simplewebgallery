@@ -2,6 +2,7 @@ use actix_files as fs;
 use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use actix_web_static_files::ResourceFiles;
 use serde::Serialize;
+use serde_json::json;
 use std::env;
 use std::path::PathBuf;
 use walkdir::WalkDir;
@@ -13,7 +14,7 @@ struct ApiRet {
     files: Vec<String>,
     dirs: Vec<String>,
     parent_dir: String,
-    curent_dir: String,
+    current_dir: String,
     filetypes_present: Vec<String>,
 }
 
@@ -24,20 +25,30 @@ struct AppConf {
 
 #[get("/api/{tail:.*}")]
 async fn api(req: HttpRequest) -> impl Responder {
+    let mut ret = ApiRet {
+        files: Vec::new(),
+        dirs: Vec::new(),
+        parent_dir: "".to_string(),
+        current_dir: "".to_string(),
+        filetypes_present: Vec::new(),
+    };
     let mut search_path = req
         .app_data::<web::Data<AppConf>>()
         .unwrap()
         .data_dir
         .clone();
     let user_path = req.path();
-    search_path.push_str(user_path.strip_prefix("/api").unwrap());
-    for entry in WalkDir::new(search_path.clone()){
+    search_path.push_str(match user_path.strip_prefix("/api") {
+        Some(str) => str,
+        None => return HttpResponse::NotFound().body(String::from("not found")),
+    });
+//todo: parse api params and fill out the apiret with them
+    for entry in WalkDir::new(search_path.clone()) {
         let entry = entry.unwrap();
-        println!("{}",entry.path().display())
+        println!("{}", entry.path().display())
+    }
 
-    };
-    
-    HttpResponse::Ok().body(format!("searching path: {}", search_path))
+    HttpResponse::Ok().json(ret)
 }
 
 #[actix_web::main]
