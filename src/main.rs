@@ -1,10 +1,10 @@
 use actix_files as fs;
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use actix_web_static_files::ResourceFiles;
 use serde::Serialize;
 use std::env;
-use std::sync::Arc;
-//use std::path::PathBuf;
+use std::path::PathBuf;
+use walkdir::WalkDir;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
@@ -17,9 +17,27 @@ struct ApiRet {
     filetypes_present: Vec<String>,
 }
 
-#[get("api")]
-async fn api() -> impl Responder {
-    HttpResponse::Ok().body("weiner")
+#[derive(Clone)]
+struct AppConf {
+    data_dir: String,
+}
+
+#[get("/api/{tail:.*}")]
+async fn api(req: HttpRequest) -> impl Responder {
+    let mut search_path = req
+        .app_data::<web::Data<AppConf>>()
+        .unwrap()
+        .data_dir
+        .clone();
+    let user_path = req.path();
+    search_path.push_str(user_path.strip_prefix("/api").unwrap());
+    for entry in WalkDir::new(search_path.clone()){
+        let entry = entry.unwrap();
+        println!("{}",entry.path().display())
+
+    };
+    
+    HttpResponse::Ok().body(format!("searching path: {}", search_path))
 }
 
 #[actix_web::main]
@@ -29,12 +47,15 @@ async fn main() -> std::io::Result<()> {
         Ok(x) => x,
         Err(_) => "data".to_string(),
     };
-    let ddir = Arc::new(ddir);
+    let conf = AppConf {
+        data_dir: ddir.clone(),
+    };
     HttpServer::new(move || {
         let generated = generate();
         App::new()
-            .service(fs::Files::new("/data", ddir.to_string()).show_files_listing())
+            .service(fs::Files::new("/data", conf.data_dir.clone()))
             .service(api)
+            .app_data(web::Data::new(conf.clone()))
             .service(ResourceFiles::new("/", generated))
     })
     .bind(("127.0.0.1", 8080))?
