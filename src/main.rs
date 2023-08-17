@@ -2,9 +2,8 @@ use actix_files as fs;
 use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use actix_web_static_files::ResourceFiles;
 use serde::Serialize;
-use serde_json::json;
 use std::env;
-use std::path::PathBuf;
+use std::collections::HashMap;
 use walkdir::WalkDir;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
@@ -13,7 +12,6 @@ include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 struct ApiRet {
     files: Vec<String>,
     dirs: Vec<String>,
-    parent_dir: String,
     current_dir: String,
     filetypes_present: Vec<String>,
 }
@@ -28,7 +26,6 @@ async fn api(req: HttpRequest) -> impl Responder {
     let mut ret = ApiRet {
         files: Vec::new(),
         dirs: Vec::new(),
-        parent_dir: "".to_string(),
         current_dir: "".to_string(),
         filetypes_present: Vec::new(),
     };
@@ -38,11 +35,12 @@ async fn api(req: HttpRequest) -> impl Responder {
         .data_dir
         .clone();
     let user_path = req.path();
+    ret.current_dir = user_path.to_string();
     search_path.push_str(match user_path.strip_prefix("/api") {
         Some(str) => str,
         None => return HttpResponse::NotFound().body(String::from("not found")),
     });
-//todo: parse api params and fill out the apiret with them
+    let q = web::Query::<HashMap<String, u32>>::from_query(req.query_string()).unwrap();
     for entry in WalkDir::new(search_path.clone()) {
         let entry = entry.unwrap();
         println!("{}", entry.path().display())
