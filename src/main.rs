@@ -4,6 +4,7 @@ use actix_web_static_files::ResourceFiles;
 use serde::{Deserialize, Serialize};
 use std::env;
 use walkdir::WalkDir;
+use urlencoding;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
@@ -34,17 +35,20 @@ async fn api(req: HttpRequest) -> impl Responder {
         current_dir: "".to_string(),
         filetypes_present: Vec::new(),
     };
-    let mut search_path = req
+    let data_dir = req
         .app_data::<web::Data<AppConf>>()
         .unwrap()
         .data_dir
         .clone();
-    let user_path = req.path();
+
+    let mut search_path = data_dir
+        .clone();
+    let user_path = urlencoding::decode(req.path()).unwrap().into_owned().to_string();
+    ret.current_dir = user_path.to_string().strip_prefix("/api").unwrap().to_string();
     search_path.push_str(match user_path.strip_prefix("/api") {
         Some(str) => str,
         None => return HttpResponse::NotFound().body(String::from("not found")),
     });
-    ret.current_dir = search_path.to_string();
     let query = web::Query::<ApiParams>::from_query(req.query_string()).unwrap();
 
     let dir_walker = match query.dir_depth {
@@ -62,15 +66,16 @@ async fn api(req: HttpRequest) -> impl Responder {
             Ok(actual_entry) => {
                 if actual_entry.file_type().is_dir() {
                     ret.dirs
-                        .push(actual_entry.path().to_string_lossy().to_string());
+                        .push(actual_entry.path().to_string_lossy().to_string().strip_prefix(&data_dir).unwrap().to_string());
                 } else {
                     let ext = match actual_entry.path().extension() {
                         Some(ext) => ext.to_string_lossy().to_string(),
                         None => String::from("nonexistent"),
                     };
                     if media_extensions.contains(&ext) {
-                        ret.files
-                            .push(actual_entry.file_name().to_string_lossy().to_string());
+                        println!("{}",actual_entry.path().to_string_lossy().to_string());
+
+                        ret.files.push(actual_entry.path().to_string_lossy().to_string().strip_prefix(&data_dir).unwrap().to_string());
                     }
                 }
             }
@@ -97,7 +102,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let generated = generate();
         App::new()
-            .service(fs::Files::new("/data", conf.data_dir.clone()))
+            .service(fs::Files::new("/data", conf.data_dir.clone()).show_files_listing())
             .service(api)
             .app_data(web::Data::new(conf.clone()))
             .service(ResourceFiles::new("/", generated))
