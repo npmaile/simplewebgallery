@@ -1,9 +1,8 @@
 use actix_files as fs;
 use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use actix_web_static_files::ResourceFiles;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::env;
-use std::collections::HashMap;
 use walkdir::WalkDir;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
@@ -21,6 +20,12 @@ struct AppConf {
     data_dir: String,
 }
 
+#[derive(Deserialize)]
+struct ApiParams {
+    dir_depth: Option<usize>,
+    media_extensions: Option<String>,
+}
+
 #[get("/api/{tail:.*}")]
 async fn api(req: HttpRequest) -> impl Responder {
     let mut ret = ApiRet {
@@ -35,15 +40,45 @@ async fn api(req: HttpRequest) -> impl Responder {
         .data_dir
         .clone();
     let user_path = req.path();
-    ret.current_dir = user_path.to_string();
     search_path.push_str(match user_path.strip_prefix("/api") {
         Some(str) => str,
         None => return HttpResponse::NotFound().body(String::from("not found")),
     });
-    let q = web::Query::<HashMap<String, u32>>::from_query(req.query_string()).unwrap();
-    for entry in WalkDir::new(search_path.clone()) {
-        let entry = entry.unwrap();
-        println!("{}", entry.path().display())
+    ret.current_dir = search_path.to_string();
+    let query = web::Query::<ApiParams>::from_query(req.query_string()).unwrap();
+
+    let dir_walker = match query.dir_depth {
+        Some(d) => WalkDir::new(search_path.clone()).max_depth(d),
+        None => WalkDir::new(search_path.clone()),
+    };
+
+    let media_extensions: Vec<String> = match &query.media_extensions{
+        Some(s) => s.split(",").map(|x| x.to_string()).collect(),
+        None => vec![] 
+    };
+
+    for entry in dir_walker {
+        match entry {
+            Ok(actual_entry) => {
+                if actual_entry.file_type().is_dir() {
+                    ret.dirs
+                        .push(actual_entry.path().to_string_lossy().to_string());
+                } else {
+                    let ext = match actual_entry.path().extension() {
+                        Some(ext) => ext.to_string_lossy().to_string(),
+                        None => String::from("nonexistent"),
+                    };
+                    if media_extensions.contains(&ext) {
+                        ret.files
+                            .push(actual_entry.file_name().to_string_lossy().to_string());
+                    }
+                }
+            }
+            Err(error) => {
+                return HttpResponse::InternalServerError()
+                    .body(format!("Error returned from walkdir: {}", error));
+            }
+        }
     }
 
     HttpResponse::Ok().json(ret)
