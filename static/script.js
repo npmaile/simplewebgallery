@@ -28,7 +28,7 @@ addvideo = function(video,id){
 	newvid.appendChild(source);
 	newvid.setAttribute('id',idString);
 	newvid.setAttribute('class','video-js');
-	newvid.setAttribute('data-setup','{"controls":"true"}');
+	newvid.setAttribute('data-setup','{"controls":"true", "preload": false}');
 	newvid.setAttribute('loop',"true");
 	newvid.setAttribute('responsive',"true");
 	newvid.setAttribute('fill',"true");
