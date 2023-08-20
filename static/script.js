@@ -65,6 +65,13 @@ loadmoaronbottom = function(){
 	}
 }
 
+function spaLink(element, apilink){
+	element.addEventListener('click', function(event) {
+		event.preventDefault();
+		reloadsite(apilink)
+	})
+}
+
 function addDirsToList(listing, dirs){
 	list = document.createElement("ul")
 	listing.appendChild(list)
@@ -79,7 +86,7 @@ function addDirsToList(listing, dirs){
 		})
 		li.appendChild(a)
 
-		a = document.createElement("a")
+		a = document.createElement("button")
 		a.innerHTML = "     photos"
 		a.href = "api" + dirs[i]
 		a.addEventListener('click', function(event) {
@@ -88,7 +95,7 @@ function addDirsToList(listing, dirs){
 		})
 		li.appendChild(a)
 
-		a = document.createElement("a")
+		a = document.createElement("button")
 		a.innerHTML = "     videos"
 		a.href = "api" + dirs[i]
 		a.addEventListener('click', function(event) {
@@ -109,6 +116,12 @@ async function generateSite(url){
 	splitParts = data.current_dir.split("/")
 	for (let i=0; i < splitParts.length; i++){
 		a = document.createElement("a")
+		if (i==0) {
+			a.innerHTML = "root"
+			a.href = "api/"
+			spaLink(a,"api/")
+			head.appendChild(a)
+		}
 		a.innerHTML = "/" + splitParts[i]
 		a.href = "api" + splitParts.slice(0,i+1).join("/")
 		a.addEventListener('click', function(event) {
@@ -117,6 +130,17 @@ async function generateSite(url){
 		})
 		head.appendChild(a)
 	}
+
+	plink = document.createElement("button")
+	plink.innerHTML = "    photos"
+	spaLink(plink, "api" + data.current_dir + "?media_extensions=jpg,png,jpeg,gif")
+	head.appendChild(plink)
+
+	vlink = document.createElement("button")
+	vlink.innerHTML = "    videos"
+	spaLink(vlink, "api" + data.current_dir + "?media_extensions=m4v,mp4,mov,webm")
+	head.appendChild(vlink)
+
 	dirsListing = document.getElementById("dirs")
 	addDirsToList(dirsListing, data.dirs)
 	medialist = data.files
