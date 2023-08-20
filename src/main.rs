@@ -73,8 +73,6 @@ async fn api(req: HttpRequest) -> impl Responder {
                         None => String::from("nonexistent"),
                     };
                     if media_extensions.contains(&ext) {
-                        println!("{}",actual_entry.path().to_string_lossy().to_string());
-
                         ret.files.push(actual_entry.path().to_string_lossy().to_string().strip_prefix(&data_dir).unwrap().to_string());
                     }
                 }

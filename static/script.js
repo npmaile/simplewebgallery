@@ -75,7 +75,7 @@ function addDirsToList(listing, dirs){
 		a.href = "api" + dirs[i]
 		a.addEventListener('click', function(event) {
 			event.preventDefault();
-			reloadsite("api"+dirs[i])
+			reloadsite("api"+dirs[i]+ "?dir_depth=1")
 		})
 		li.appendChild(a)
 
@@ -84,7 +84,7 @@ function addDirsToList(listing, dirs){
 		a.href = "api" + dirs[i]
 		a.addEventListener('click', function(event) {
 			event.preventDefault();
-			reloadsite("api"+dirs[i]+ "?media_extensions=jpg,png,jpeg,gif")
+			reloadsite("api"+dirs[i]+ "?media_extensions=jpg,png,jpeg,gif&dir_depth=1")
 		})
 		li.appendChild(a)
 
@@ -93,7 +93,7 @@ function addDirsToList(listing, dirs){
 		a.href = "api" + dirs[i]
 		a.addEventListener('click', function(event) {
 			event.preventDefault();
-			reloadsite("api"+dirs[i]+ "?media_extensions=m4v,mp4,mov,webm")
+			reloadsite("api"+dirs[i]+ "?media_extensions=m4v,mp4,mov,webm&dir_depth=1")
 		})
 		li.appendChild(a)
 
@@ -104,10 +104,7 @@ function addDirsToList(listing, dirs){
 async function generateSite(url){
 	res = await fetch(url);
 	txt = await res.text()
-	console.log(txt)
 	data = JSON.parse(txt)
-	//data = await res.json();
-	console.log(data)
 	head = document.getElementById("current_dir")
 	splitParts = data.current_dir.split("/")
 	for (let i=0; i < splitParts.length; i++){
@@ -116,24 +113,29 @@ async function generateSite(url){
 		a.href = "api" + splitParts.slice(0,i+1).join("/")
 		a.addEventListener('click', function(event) {
 			event.preventDefault();
-			reloadsite("api"+splitParts.slice(0,i+1).join("/"))
+			reloadsite("api"+splitParts.slice(0,i+1).join("/") + "?dir_depth=1")
 		})
 		head.appendChild(a)
 	}
 	dirsListing = document.getElementById("dirs")
 	addDirsToList(dirsListing, data.dirs)
-
 	medialist = data.files
+	iter = 0;
+	genMedia(20);
 }
 
-function reloadsite(url){
+async function reloadsite(url){
 	toclear = ["current_dir","dirs","gallery"]
 	for (let i = 0; i < toclear.length; i++){
 		x = document.getElementById(toclear[i])
+		for (let j = 0; j < x.children; x++){
+			c.removeChild(x.children[0])
+		}
 		x.innerHTML = ""
 	}
+	medialist = []
 	alreadyloadedonce = 0
-	generateSite(url)	
+	await generateSite(url)	
 	if (alreadyloadedonce == 0){
 		genMedia(20);
 		alreadyloadedonce = 1;
