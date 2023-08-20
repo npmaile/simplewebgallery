@@ -52,9 +52,11 @@ async fn api(req: HttpRequest) -> impl Responder {
     let query = web::Query::<ApiParams>::from_query(req.query_string()).unwrap();
 
     let dir_walker = match query.dir_depth {
-        Some(d) => WalkDir::new(search_path.clone()).max_depth(d),
-        None => WalkDir::new(search_path.clone()),
+        Some(d) => WalkDir::new(search_path.clone()).sort_by(|a,b| a.file_name().to_ascii_lowercase().cmp(&b.file_name().to_ascii_lowercase())).max_depth(d),
+        None => WalkDir::new(search_path.clone()).sort_by(|a,b| a.file_name().to_ascii_lowercase().cmp(&b.file_name().to_ascii_lowercase())),
     };
+
+
 
     let media_extensions: Vec<String> = match &query.media_extensions{
         Some(s) => s.split(",").map(|x| x.to_string()).collect(),
