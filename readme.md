@@ -1,18 +1,8 @@
-this is the simple media browser.
+# SimpleWebGallery
+This is the simple media browser.
 
-it uses a php script to generate a webpage to more easily and efficiently browse media
+## Building
+`cargo build`
 
-
-
-to use it: run the genconf.sh and put that into nginx.conf
-
-place symlinks to your media galleries in the data directory
-
-throw open your web browser and browse your media.
-
-
-
-needs:
-nginx
-php-fpm
-
+## Usage:
+`DATA_DIR=/path/to/the/directory/you/wish/to/serve target/release/simplewebgallery`
