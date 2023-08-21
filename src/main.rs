@@ -3,8 +3,8 @@ use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder}
 use actix_web_static_files::ResourceFiles;
 use serde::{Deserialize, Serialize};
 use std::env;
-use walkdir::WalkDir;
 use urlencoding;
+use walkdir::WalkDir;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
@@ -41,10 +41,16 @@ async fn api(req: HttpRequest) -> impl Responder {
         .data_dir
         .clone();
 
-    let mut search_path = data_dir
-        .clone();
-    let user_path = urlencoding::decode(req.path()).unwrap().into_owned().to_string();
-    ret.current_dir = user_path.to_string().strip_prefix("/api").unwrap().to_string();
+    let mut search_path = data_dir.clone();
+    let user_path = urlencoding::decode(req.path())
+        .unwrap()
+        .into_owned()
+        .to_string();
+    ret.current_dir = user_path
+        .to_string()
+        .strip_prefix("/api")
+        .unwrap()
+        .to_string();
     search_path.push_str(match user_path.strip_prefix("/api") {
         Some(str) => str,
         None => return HttpResponse::NotFound().body(String::from("not found")),
@@ -52,31 +58,35 @@ async fn api(req: HttpRequest) -> impl Responder {
     let query = web::Query::<ApiParams>::from_query(req.query_string()).unwrap();
 
     let dir_walker = match query.dir_depth {
-        Some(d) => WalkDir::new(search_path.clone()).sort_by(|a,b| a.file_name().to_ascii_lowercase().cmp(&b.file_name().to_ascii_lowercase())).max_depth(d),
-        None => WalkDir::new(search_path.clone()).sort_by(|a,b| a.file_name().to_ascii_lowercase().cmp(&b.file_name().to_ascii_lowercase())),
-    };
-
-
-
-    let media_extensions: Vec<String> = match &query.media_extensions{
-        Some(s) => s.split(",").map(|x| x.to_string()).collect(),
-        None => vec![] 
+        Some(d) => WalkDir::new(search_path.clone())
+            .sort_by(|a, b| {
+                a.file_name()
+                    .to_ascii_lowercase()
+                    .cmp(&b.file_name().to_ascii_lowercase())
+            })
+            .max_depth(d),
+        None => WalkDir::new(search_path.clone()).sort_by(|a, b| {
+            a.file_name()
+                .to_ascii_lowercase()
+                .cmp(&b.file_name().to_ascii_lowercase())
+        }),
     };
 
     for entry in dir_walker {
         match entry {
             Ok(actual_entry) => {
                 if actual_entry.file_type().is_dir() {
-                    ret.dirs
-                        .push(actual_entry.path().to_string_lossy().to_string().strip_prefix(&data_dir).unwrap().to_string());
+                    ret.dirs.push(
+                        actual_entry
+                            .path()
+                            .to_string_lossy()
+                            .to_string()
+                            .strip_prefix(&data_dir)
+                            .unwrap()
+                            .to_string(),
+                    );
                 } else {
-                    let ext = match actual_entry.path().extension() {
-                        Some(ext) => ext.to_string_lossy().to_string(),
-                        None => String::from("nonexistent"),
-                    };
-                    if media_extensions.contains(&ext) {
-                        ret.files.push(actual_entry.path().to_string_lossy().to_string().strip_prefix(&data_dir).unwrap().to_string());
-                    }
+                    continue
                 }
             }
             Err(error) => {
@@ -86,6 +96,50 @@ async fn api(req: HttpRequest) -> impl Responder {
         }
     }
 
+    let media_extensions: Vec<String> = match &query.media_extensions {
+        Some(s) => s.split(",").map(|x| x.to_string()).collect(),
+        None => vec![],
+    };
+    if media_extensions.len() == 0{
+        // early return if no files need to be searched
+        return HttpResponse::Ok().json(ret)
+    }
+
+    let file_walker = WalkDir::new(search_path.clone()).sort_by(|a, b| {
+            a.file_name()
+                .to_ascii_lowercase()
+                .cmp(&b.file_name().to_ascii_lowercase())
+    });
+
+    for entry in file_walker {
+        match entry {
+            Ok(actual_entry) => {
+                if actual_entry.file_type().is_dir() {
+                    continue
+                } else {
+                    let ext = match actual_entry.path().extension() {
+                        Some(ext) => ext.to_string_lossy().to_string(),
+                        None => String::from("nonexistent"),
+                    };
+                    if media_extensions.contains(&ext) {
+                        ret.files.push(
+                            actual_entry
+                                .path()
+                                .to_string_lossy()
+                                .to_string()
+                                .strip_prefix(&data_dir)
+                                .unwrap()
+                                .to_string(),
+                        );
+                    }
+                }
+            }
+            Err(error) => {
+                return HttpResponse::InternalServerError()
+                    .body(format!("Error returned from walkdir: {}", error));
+            }
+        }
+    }
     HttpResponse::Ok().json(ret)
 }
 

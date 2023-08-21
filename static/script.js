@@ -119,8 +119,9 @@ async function generateSite(url){
 		if (i==0) {
 			a.innerHTML = "root"
 			a.href = "api/"
-			spaLink(a,"api/")
+			spaLink(a,"api/?dir_depth=1")
 			head.appendChild(a)
+			continue
 		}
 		a.innerHTML = "/" + splitParts[i]
 		a.href = "api" + splitParts.slice(0,i+1).join("/")
@@ -133,12 +134,12 @@ async function generateSite(url){
 
 	plink = document.createElement("button")
 	plink.innerHTML = "    photos"
-	spaLink(plink, "api" + data.current_dir + "?media_extensions=jpg,png,jpeg,gif")
+	spaLink(plink, "api" + data.current_dir + "?media_extensions=jpg,png,jpeg,gif&dir_depth=1")
 	head.appendChild(plink)
 
 	vlink = document.createElement("button")
 	vlink.innerHTML = "    videos"
-	spaLink(vlink, "api" + data.current_dir + "?media_extensions=m4v,mp4,mov,webm")
+	spaLink(vlink, "api" + data.current_dir + "?media_extensions=m4v,mp4,mov,webm&dir_depth=1")
 	head.appendChild(vlink)
 
 	dirsListing = document.getElementById("dirs")
