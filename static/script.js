@@ -167,11 +167,35 @@ async function reloadsite(url){
 	}
 }
 
+let keepautoscrolling = false
+
+function autoscroll(){
+	window.scrollBy(0,1);
+	if (!keepautoscrolling) {
+		return
+	}
+	scrolldelay = setTimeout(autoscroll, 10);
+}
+
+function setupAutoScrolling(){
+	let sb = document.getElementById("scrollbutton")
+	sb.addEventListener('click', function(event) {
+		keepautoscrolling = true
+		autoscroll()
+	})
+	let hw = document.getElementById("stopscrollbutton")
+	hw.addEventListener('click', function(event) {
+		keepautoscrolling = false
+	})
+}
+
 window.onresize = setMediaHeight;
 window.onscroll = loadmoaronbottom;
 var alreadyloadedonce = 0
+
 window.onload = function(){
 	reloadsite("api/?dir_depth=1")
+	setupAutoScrolling()
 }
 
 
