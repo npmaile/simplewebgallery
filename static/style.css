@@ -16,8 +16,22 @@ title{
 	color: white;
 }
 
-.hoverwindow {
+.viewControls {
 	position: fixed;
 	top: 10;
 	right: 10;
+	z-index: 2;
+}
+
+#content{
+	position: absolute;
+	top: 50;
+	z-index: 1;
+}
+
+#current_dir{
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 2;
 }

@@ -131,7 +131,6 @@ async function generateSite(url){
 		})
 		head.appendChild(a)
 	}
-
 	plink = document.createElement("button")
 	plink.innerHTML = "    photos"
 	spaLink(plink, "api" + data.current_dir + "?media_extensions=jpg,png,jpeg,gif&dir_depth=1")

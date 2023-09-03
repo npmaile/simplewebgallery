@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use urlencoding;
 use walkdir::WalkDir;
+use rand::thread_rng;
+use rand::seq::SliceRandom;
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
@@ -25,6 +27,7 @@ struct AppConf {
 struct ApiParams {
     dir_depth: Option<usize>,
     media_extensions: Option<String>,
+    file_sort: Option<String>,
 }
 
 #[get("/api/{tail:.*}")]
@@ -139,6 +142,18 @@ async fn api(req: HttpRequest) -> impl Responder {
                     .body(format!("Error returned from walkdir: {}", error));
             }
         }
+    }
+    let file_sort: Vec<String> = match &query.file_sort {
+        Some(s) => s.split(",").map(|x| x.to_string()).collect(),
+        None => vec![],
+    };
+    // the only existing file sort is random or alphabetical
+    match file_sort.len(){
+        0 => (),
+        1 => {
+            ret.files.shuffle(&mut thread_rng())
+        },
+        _ => (),
     }
     HttpResponse::Ok().json(ret)
 }
