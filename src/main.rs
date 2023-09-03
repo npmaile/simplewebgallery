@@ -86,7 +86,7 @@ async fn api(req: HttpRequest) -> impl Responder {
                             .to_string(),
                     );
                 } else {
-                    continue
+                    continue;
                 }
             }
             Err(error) => {
@@ -100,25 +100,25 @@ async fn api(req: HttpRequest) -> impl Responder {
         Some(s) => s.split(",").map(|x| x.to_string()).collect(),
         None => vec![],
     };
-    if media_extensions.len() == 0{
+    if media_extensions.len() == 0 {
         // early return if no files need to be searched
-        return HttpResponse::Ok().json(ret)
+        return HttpResponse::Ok().json(ret);
     }
 
     let file_walker = WalkDir::new(search_path.clone()).sort_by(|a, b| {
-            a.file_name()
-                .to_ascii_lowercase()
-                .cmp(&b.file_name().to_ascii_lowercase())
+        a.file_name()
+            .to_ascii_lowercase()
+            .cmp(&b.file_name().to_ascii_lowercase())
     });
 
     for entry in file_walker {
         match entry {
             Ok(actual_entry) => {
                 if actual_entry.file_type().is_dir() {
-                    continue
+                    continue;
                 } else {
                     let ext = match actual_entry.path().extension() {
-                        Some(ext) => ext.to_string_lossy().to_string(),
+                        Some(ext) => ext.to_string_lossy().to_string().to_ascii_lowercase(),
                         None => String::from("nonexistent"),
                     };
                     if media_extensions.contains(&ext) {

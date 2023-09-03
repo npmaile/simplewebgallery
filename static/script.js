@@ -44,10 +44,10 @@ addvideo = function(video,id){
 
 genMedia = function(num){
 	while(num > 0 && iter < medialist.length){
-		if (/.*\.(jpeg|jpg|gif|png)$/.test(medialist[iter])){
+		if (/.*\.(jpeg|jpg|gif|png)$/.test(medialist[iter].toLowerCase())){
 			addimage(medialist[iter]);
 		}
-		else if (/.*\.(m4v|mp4|mov|webm)$/.test(medialist[iter])){
+		else if (/.*\.(m4v|mp4|mov|webm)$/.test(medialist[iter].toLowerCase())){
 			addvideo(medialist[iter],iter);
 		}
 		iter ++;
@@ -186,6 +186,10 @@ function setupAutoScrolling(){
 	let hw = document.getElementById("stopscrollbutton")
 	hw.addEventListener('click', function(event) {
 		keepautoscrolling = false
+	})
+	let top = document.getElementById("returnToTop")
+	top.addEventListener('click', function(event) {
+		window.scrollTo(0,0)
 	})
 }
 
