@@ -1,5 +1,5 @@
 # SimpleWebGallery
-This is the simple media browser.
+This is a simple media browser.
 
 ## Building
 `cargo build`
