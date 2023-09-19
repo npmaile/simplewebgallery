@@ -10,36 +10,37 @@ setMediaHeight = function() {
 	}
 }
 
-addimage = function(image, id) {
+addimage = function(image) {
+	var idString = "v" + Math.random().toString(36).slice(2,35)
 	var paragraph = document.getElementById("gallery");
 	var newimage = document.createElement("img");
 	newimage.setAttribute('src', "data" + image);
-	newimage.setAttribute('id', id);
+	newimage.setAttribute('id', idString);
 	newimage.setAttribute('class', 'image');
 	paragraph.appendChild(newimage);
 }
 
-addvideo = function(video, id) {
-	var idString = "video" + String(id)
+addvideo = function(video) {
+	var idString = "v" + Math.random().toString(36).slice(2,35)
 	var paragraph = document.getElementById("gallery");
 	var newvid = document.createElement("video");
 	var source = document.createElement("source");
 	source.setAttribute('src', "data" + video);
 	newvid.appendChild(source);
 	newvid.setAttribute('id', idString);
-	newvid.setAttribute('class', 'video-js');
-	newvid.setAttribute('data-setup', '{"controls":"true", "preload": false}');
+	newvid.setAttribute('class', 'video-js vjs-default-skin');
 	newvid.setAttribute('loop', "true");
 	newvid.setAttribute('responsive', "true");
 	newvid.setAttribute('fill', "true");
 	paragraph.appendChild(newvid);
 
-	videojs(idString);
-
 	var title = document.createElement("div");
 	title.innerHTML = video;
 	title.setAttribute('class', 'title');
 	paragraph.appendChild(title);
+	videojs(idString,{
+		"controls":true, "preload": false, "fluid":true
+	});
 }
 
 genMedia = function(num) {
@@ -48,7 +49,7 @@ genMedia = function(num) {
 			addimage(medialist[iter]);
 		}
 		else if (/.*\.(m4v|mp4|mov|webm)$/.test(medialist[iter].toLowerCase())) {
-			addvideo(medialist[iter], iter);
+			addvideo(medialist[iter]);
 		}
 		iter++;
 		num--;
@@ -150,6 +151,20 @@ async function generateSite(url) {
 }
 
 async function reloadsite(url) {
+	/*
+	//murder all videojs videos
+	if (videojs.players.length != undefined){
+		let players = videojs.players
+		let playerNames = Object.keys(players)
+		for (let i = 0; i < playerNames.length; i++){
+			player = players[playerNames[i]]
+			if player != undefined{
+				player.dispose()
+			}
+		}
+	}
+	*/
+	
 	toclear = ["current_dir", "dirs", "gallery"]
 	for (let i = 0; i < toclear.length; i++) {
 		x = document.getElementById(toclear[i])
