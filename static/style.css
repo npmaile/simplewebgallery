@@ -2,7 +2,7 @@
 	color-scheme: light dark;
 }
 
-video{
+.video-container{
 	max-width: 100vw;
 	max-height: 100vh;
 }

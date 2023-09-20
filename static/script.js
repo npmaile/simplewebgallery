@@ -30,9 +30,12 @@ addvideo = function(video) {
 	newvid.setAttribute('id', idString);
 	newvid.setAttribute('class', 'video-js vjs-default-skin');
 	newvid.setAttribute('loop', "true");
-	newvid.setAttribute('responsive', "true");
-	newvid.setAttribute('fill', "true");
-	paragraph.appendChild(newvid);
+	//newvid.setAttribute('fill', "true");
+
+	var container = document.createElement("div");
+	container.appendChild(newvid)
+	container.setAttribute('class','video-container')
+	paragraph.appendChild(container);
 
 	var title = document.createElement("div");
 	title.innerHTML = video;
