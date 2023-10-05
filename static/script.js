@@ -30,7 +30,6 @@ addvideo = function(video) {
 	newvid.setAttribute('id', idString);
 	newvid.setAttribute('class', 'video-js vjs-default-skin');
 	newvid.setAttribute('loop', "true");
-	//newvid.setAttribute('fill', "true");
 
 	var container = document.createElement("div");
 	container.appendChild(newvid)
@@ -42,7 +41,7 @@ addvideo = function(video) {
 	title.setAttribute('class', 'title');
 	paragraph.appendChild(title);
 	videojs(idString,{
-		"controls":true, "preload": false, "fluid":true
+		"controls":true, "preload": false, "fill":true
 	});
 }
 
