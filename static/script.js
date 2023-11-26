@@ -193,7 +193,10 @@ async function reloadsite(url) {
 let keepautoscrolling = false
 
 function autoscroll() {
-	window.scrollBy(0, 1);
+	window.scrollBy(0, scrollspeed/100);
+	if (scrollspeed == 0){
+	    keepautoscrolling = false
+	}
 	if (!keepautoscrolling) {
 		return
 	}
@@ -201,14 +204,15 @@ function autoscroll() {
 }
 
 function setupAutoScrolling() {
-	let sb = document.getElementById("scrollbutton")
-	sb.addEventListener('click', function(_event) {
+	let slider = document.getElementById("scrollslider")
+	slider.addEventListener('change', function(){
 		keepautoscrolling = true
+		scrollspeed = slider.value
 		autoscroll()
 	})
 	let hw = document.getElementById("stopscrollbutton")
 	hw.addEventListener('click', function(_event) {
-		keepautoscrolling = false
+		scrollspeed = 0
 	})
 	let top = document.getElementById("returnToTop")
 	top.addEventListener('click', function(_event) {
@@ -216,8 +220,12 @@ function setupAutoScrolling() {
 	})
 }
 
+scrollspeed = 0
 window.onresize = setMediaHeight;
-window.onscroll = loadmoaronbottom;
+document.addEventListener('scroll' , function(){
+	loadmoaronbottom()
+})
+
 var alreadyloadedonce = 0
 
 window.onload = function() {
