@@ -7,6 +7,7 @@ use urlencoding;
 use walkdir::WalkDir;
 use rand::thread_rng;
 use rand::seq::SliceRandom;
+use std::io::{self, Write};
 
 include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 
@@ -168,6 +169,8 @@ async fn main() -> std::io::Result<()> {
     let conf = AppConf {
         data_dir: ddir.clone(),
     };
+    print!("serving {} on port: {}", ddir, 8080);
+    let _ = io::stdout().flush();
     HttpServer::new(move || {
         let generated = generate();
         App::new()
