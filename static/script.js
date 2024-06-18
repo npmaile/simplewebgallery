@@ -25,7 +25,7 @@ addvideo = function(video) {
 	var paragraph = document.getElementById("gallery");
 	var newvid = document.createElement("video");
 	var source = document.createElement("source");
-	source.setAttribute('src', "data" + video);
+	source.setAttribute('src', "data" + encodeURIComponent(video));
 	newvid.appendChild(source);
 	newvid.setAttribute('id', idString);
 	newvid.setAttribute('class', 'video-js vjs-default-skin');
@@ -232,6 +232,4 @@ window.onload = function() {
 	reloadsite("api/?dir_depth=1")
 	setupAutoScrolling()
 }
-
-
 
